@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Offline-safe font stacks; swap for next/font (Newsreader + Inter) in production. */
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-paper text-ink font-sans;
+    background-image: radial-gradient(circle at 50% -10%, #fffdf8 0%, #faf7f0 55%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: #f5e2d6;
+  }
+}
+
+@layer components {
+  .container-prose {
+    @apply mx-auto w-full max-w-prose px-5;
+  }
+  .container-wide {
+    @apply mx-auto w-full max-w-6xl px-5;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-ink-soft;
+  }
+  .btn-clay {
+    @apply btn bg-clay-500 text-white hover:bg-clay-600;
+  }
+  .btn-ghost {
+    @apply btn border border-paper-edge bg-paper-card text-ink hover:border-clay-400;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-paper-edge bg-paper-card px-3 py-1 text-xs font-medium text-ink-mute;
+  }
+  .card {
+    @apply rounded-2xl border border-paper-edge bg-paper-card shadow-card;
+  }
+  .section-rule {
+    @apply flex items-center gap-3 text-clay-600;
+  }
+  .section-rule::after {
+    content: '';
+    @apply h-px flex-1 bg-paper-edge;
+  }
+  .hairline {
+    @apply border-t border-paper-edge;
+  }
+}
