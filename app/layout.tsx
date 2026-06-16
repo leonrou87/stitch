@@ -25,6 +25,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* TravelPayouts site verification + tracking (project 540243). Rendered in the
+            server HTML head so their verifier detects it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function () { var script = document.createElement("script"); script.async = 1; script.src = 'https://emrldco.com/NTQwMjQz.js?t=540243'; document.head.appendChild(script); })();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen">
         <SiteHeader />
         <main>{children}</main>
