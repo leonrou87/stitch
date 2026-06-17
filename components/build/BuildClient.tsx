@@ -29,18 +29,15 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
   const [flightMsg, setFlightMsg] = useState<string | null>(null)
   const [showFlights, setShowFlights] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const [autoGo, setAutoGo] = useState(false)
-
-  // Deep-link preselection: /build/[city]?add=id1,id2 — shareable build links.
-  // ?go=1 also runs the stitch+save end-to-end and redirects to the saved trip.
+  // Deep-link preselection for "Edit": /build/[city]?add=id1,id2 loads those picks.
+  // (One-tap curated trips save server-side via /go/[bundleId] — no client auto-save.)
   useEffect(() => {
-    const sp = new URLSearchParams(window.location.search)
-    const ids = sp.get('add')
+    const ids = new URLSearchParams(window.location.search).get('add')
     if (ids) {
       const valid = ids.split(',').filter((id) => all.some((p) => p.id === id))
       if (valid.length) setSelected(valid)
-      if (sp.get('go') === '1') setAutoGo(true)
     }
   }, [all])
 
@@ -63,12 +60,6 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
 
-  // Fire the real stitch+save once a ?go=1 deep link has its picks loaded.
-  useEffect(() => {
-    if (autoGo && preview && !saving) { setAutoGo(false); void save() }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoGo, preview])
-
   async function getFlights() {
     if (!origin.trim()) return
     setFlightMsg('Looking up flights…')
@@ -83,18 +74,24 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
   }
 
   async function save() {
-    if (!preview) return
+    if (!preview || saving) return
     setSaving(true)
+    setError(null)
     try {
       const res = await fetch('/api/itineraries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itinerary: preview }),
       })
-      const data = await res.json()
-      if (data.url) router.push(data.url)
-      else setSaving(false)
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data.url) {
+        router.push(data.url)
+        return // keep the saving state through navigation
+      }
+      setError("Couldn't save your trip. Give it another try.")
+      setSaving(false)
     } catch {
+      setError('Connection dropped while saving. Try again.')
       setSaving(false)
     }
   }
@@ -226,6 +223,7 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
             >
               {saving ? 'Arranging your days…' : 'See my itinerary'}
             </button>
+            {error && <p className="mt-2 text-center text-sm text-clay-600">{error}</p>}
 
             {/* Flights — quiet, optional, tucked away */}
             <div className="mt-3 border-t border-paper-edge pt-3">
