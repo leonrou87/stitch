@@ -39,9 +39,28 @@ const config: Config = {
       maxWidth: {
         prose: '46rem',
       },
+      fontSize: {
+        // Tightened, editorial-leaning scale with paired line-heights.
+        xs: ['0.75rem', { lineHeight: '1.1rem' }],
+        sm: ['0.875rem', { lineHeight: '1.4rem' }],
+        base: ['1rem', { lineHeight: '1.65rem' }],
+        lg: ['1.125rem', { lineHeight: '1.7rem' }],
+        xl: ['1.3rem', { lineHeight: '1.65rem', letterSpacing: '-0.01em' }],
+        '2xl': ['1.6rem', { lineHeight: '1.25', letterSpacing: '-0.015em' }],
+        '3xl': ['2.05rem', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+        '4xl': ['2.7rem', { lineHeight: '1.08', letterSpacing: '-0.022em' }],
+        '5xl': ['3.4rem', { lineHeight: '1.04', letterSpacing: '-0.025em' }],
+        '6xl': ['4.25rem', { lineHeight: '1', letterSpacing: '-0.028em' }],
+      },
+      borderRadius: {
+        card: '1.125rem',
+      },
       boxShadow: {
-        card: '0 1px 2px rgba(26,26,23,0.04), 0 8px 24px -12px rgba(26,26,23,0.12)',
-        lift: '0 12px 40px -16px rgba(26,26,23,0.28)',
+        card: '0 1px 2px rgba(26,26,23,0.04), 0 10px 30px -18px rgba(26,26,23,0.16)',
+        lift: '0 18px 48px -22px rgba(26,26,23,0.30)',
+      },
+      transitionTimingFunction: {
+        gentle: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
       },
     },
   },

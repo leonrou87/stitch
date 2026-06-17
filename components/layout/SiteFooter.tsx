@@ -1,39 +1,57 @@
 import Link from 'next/link'
 
-const cols = [
-  { head: 'Explore', links: [['Curated trips', '/trips'], ['Destinations', '/guide'], ['Build a trip', '/build']] },
-  { head: 'Product', links: [['How it works', '/about'], ['Pricing', '/about'], ['Partners', '/affiliate-disclosure']] },
-  { head: 'Company', links: [['About', '/about'], ['Privacy', '/privacy'], ['Terms', '/terms']] },
-]
+const explore = [
+  ['Curated trips', '/trips'],
+  ['Destinations', '/guide'],
+  ['How it works', '/about'],
+  ['Build a trip', '/build'],
+] as const
+
+const legal = [
+  ['Affiliate disclosure', '/affiliate-disclosure'],
+  ['Privacy', '/privacy'],
+  ['Terms', '/terms'],
+] as const
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-paper-edge bg-paper-card/60">
-      <div className="container-wide grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
+    <footer className="mt-28 border-t border-paper-edge bg-paper-card/60">
+      <div className="container-wide flex flex-col gap-10 py-14 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-xs">
           <div className="flex items-center gap-2">
-            <span aria-hidden className="text-clay-500 text-lg">✦</span>
+            <span aria-hidden className="text-lg text-clay-500">✦</span>
             <span className="font-serif text-lg">Stitch</span>
           </div>
-          <p className="mt-3 max-w-xs text-sm text-ink-mute">Plan a trip that&apos;s actually yours.</p>
+          <p className="mt-3 text-sm leading-relaxed text-ink-mute">
+            Plan a trip that&apos;s actually yours.
+          </p>
         </div>
-        {cols.map((c) => (
-          <div key={c.head}>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-mute">{c.head}</h4>
-            <ul className="mt-4 space-y-2.5 text-sm text-ink-soft">
-              {c.links.map(([label, href]) => (
-                <li key={label}><Link href={href} className="hover:text-clay-600">{label}</Link></li>
-              ))}
-            </ul>
-          </div>
-        ))}
+
+        <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm">
+          {explore.map(([label, href]) => (
+            <Link
+              key={href}
+              href={href}
+              className="text-ink-soft transition-colors duration-200 hover:text-clay-700"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
-      <div className="container-wide flex flex-col gap-2 border-t border-paper-edge py-6 text-xs text-ink-mute sm:flex-row sm:items-center sm:justify-between">
+
+      <div className="container-wide flex flex-col gap-3 border-t border-paper-edge py-6 text-xs text-ink-mute sm:flex-row sm:items-center sm:justify-between">
         <p>© {new Date().getFullYear()} Stitch. Affiliate-supported, never paid placement.</p>
-        <div className="flex gap-4">
-          <Link href="/affiliate-disclosure" className="hover:text-clay-600">Affiliate disclosure</Link>
-          <Link href="/privacy" className="hover:text-clay-600">Privacy</Link>
-          <Link href="/terms" className="hover:text-clay-600">Terms</Link>
+        <div className="flex flex-wrap gap-x-5 gap-y-2">
+          {legal.map(([label, href]) => (
+            <Link
+              key={href}
+              href={href}
+              className="transition-colors duration-200 hover:text-clay-700"
+            >
+              {label}
+            </Link>
+          ))}
         </div>
       </div>
     </footer>

@@ -12,10 +12,6 @@ const CAT_LABEL: Record<PlaceCategory, string> = {
   cafe: 'Cafés', food: 'Food', bar: 'Bars', sight: 'Sights', gallery: 'Art & museums',
   experience: 'Experiences', outdoor: 'Outdoors', shop: 'Shops', market: 'Markets', stay: 'Stays',
 }
-const CAT_ICON: Record<PlaceCategory, string> = {
-  cafe: '☕', food: '🍽', bar: '🍸', sight: '📸', gallery: '🖼', experience: '✨',
-  outdoor: '⛰', shop: '🛍', market: '🧺', stay: '🛏',
-}
 const dollars = (n: number) => '$'.repeat(n)
 
 export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName: string }) {
@@ -31,6 +27,7 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
   const [origin, setOrigin] = useState('')
   const [flights, setFlights] = useState<FlightOption[]>([])
   const [flightMsg, setFlightMsg] = useState<string | null>(null)
+  const [showFlights, setShowFlights] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const [autoGo, setAutoGo] = useState(false)
@@ -61,7 +58,7 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
     () => (selectedPlaces.length ? stitchItinerary(citySlug, selectedPlaces, { durationDays: duration, pace, flights }) : null),
     [citySlug, selected, duration, pace, flights], // eslint-disable-line react-hooks/exhaustive-deps
   )
-  const suggestions = useMemo(() => suggestPlaces(citySlug, selected, 4), [citySlug, selected])
+  const suggestions = useMemo(() => suggestPlaces(citySlug, selected, 2), [citySlug, selected])
 
   const toggle = (id: string) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]))
@@ -102,35 +99,34 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
     }
   }
 
+  const count = selected.length
+
   return (
-    <div className="container-wide py-8">
-      <div className="mb-6">
-        <h1 className="font-serif text-3xl">Build your {cityName} trip</h1>
-        <p className="mt-1 text-ink-soft">
-          Pick the places you actually want. We&apos;ll stitch them into days — clustered by
-          neighborhood, paced, lunch and dinner in the right slots.
-        </p>
+    <div className="container-wide py-8 pb-28 lg:pb-8">
+      {/* One-line instruction */}
+      <div className="mb-8">
+        <h1 className="font-serif text-3xl">{cityName}</h1>
+        <p className="mt-1 text-lg text-ink-soft">Pick a few places. We arrange them into days.</p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+      <div className="grid items-start gap-10 lg:grid-cols-[1fr_360px]">
         {/* Catalog */}
         <div>
-          <div className="sticky top-16 z-10 -mx-1 mb-4 bg-paper/80 px-1 py-2 backdrop-blur">
+          {/* Calm, single-row filters */}
+          <div className="sticky top-16 z-10 -mx-1 mb-5 space-y-2.5 bg-paper/85 px-1 py-3 backdrop-blur">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${cityName}…`}
-              className="mb-3 w-full rounded-full border border-paper-edge bg-paper-card px-4 py-2 text-sm outline-none focus:border-clay-400"
+              placeholder={`Search ${cityName}`}
+              className="w-full rounded-full border border-paper-edge bg-paper-card px-4 py-2.5 text-sm outline-none transition-colors focus:border-clay-400"
             />
-            <div className="flex flex-wrap gap-1.5">
-              <FilterChip active={cat === 'all'} onClick={() => setCat('all')}>All</FilterChip>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <FilterChip active={cat === 'all'} onClick={() => setCat('all')}>All types</FilterChip>
               {categories.map((c) => (
-                <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>
-                  {CAT_ICON[c]} {CAT_LABEL[c]}
-                </FilterChip>
+                <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>{CAT_LABEL[c]}</FilterChip>
               ))}
             </div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <FilterChip active={hood === 'all'} onClick={() => setHood('all')}>All areas</FilterChip>
               {neighborhoods.map((n) => (
                 <FilterChip key={n} active={hood === n} onClick={() => setHood(n)}>{n}</FilterChip>
@@ -138,29 +134,31 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {filtered.map((p) => (
               <PlaceCard key={p.id} place={p} added={selected.includes(p.id)} onToggle={() => toggle(p.id)} />
             ))}
-            {filtered.length === 0 && <p className="text-ink-mute">Nothing matches those filters.</p>}
           </div>
+          {filtered.length === 0 && (
+            <p className="py-12 text-center text-ink-mute">Nothing matches those filters. Try clearing one.</p>
+          )}
         </div>
 
         {/* Tray */}
-        <aside className="lg:sticky lg:top-16 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pb-8">
+        <aside className="lg:sticky lg:top-16 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pb-8">
           <div className="card p-5">
             <div className="flex items-baseline justify-between">
               <h2 className="font-serif text-xl">Your trip</h2>
-              <span className="text-sm text-ink-mute">{selected.length} place{selected.length === 1 ? '' : 's'}</span>
+              <span className="text-sm text-ink-mute">{count} place{count === 1 ? '' : 's'}</span>
             </div>
 
-            {/* Controls */}
+            {/* Trip shape */}
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-ink-soft">Days</span>
                 <Stepper value={duration} min={1} max={10} onChange={setDuration} />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-sm text-ink-soft">Pace</span>
                 <div className="flex gap-1">
                   {(['slow', 'moderate', 'packed'] as const).map((p) => (
@@ -168,45 +166,57 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
                   ))}
                 </div>
               </div>
-              <div>
-                <div className="flex gap-2">
-                  <input
-                    value={origin}
-                    onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-                    placeholder="From (e.g. SFO)"
-                    className="w-full rounded-full border border-paper-edge bg-paper px-3 py-1.5 text-sm outline-none focus:border-clay-400"
-                  />
-                  <button onClick={getFlights} className="btn-ghost shrink-0 px-3 py-1.5 text-sm">Flights</button>
-                </div>
-                {flightMsg && <p className="mt-1 text-xs text-ink-mute">{flightMsg}</p>}
-                {flights.map((f, i) => (
-                  <div key={i} className="mt-2 rounded-lg bg-paper p-2 text-xs text-ink-soft">
-                    <span className="font-medium">{f.outbound.from} → {f.outbound.to}</span> · ~${f.estimatedPriceUsd.toLocaleString()} rt · {f.outbound.durationHours}h
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <div className="mt-5 border-t border-paper-edge pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink-mute">You might add</p>
-                <div className="mt-2 space-y-1.5">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s.place.id}
-                      onClick={() => toggle(s.place.id)}
-                      className="flex w-full items-start gap-2 rounded-lg border border-paper-edge bg-paper-card p-2 text-left text-sm hover:border-clay-400"
-                    >
-                      <span className="text-clay-500">＋</span>
-                      <span>
-                        <span className="font-medium">{s.place.name}</span>
-                        <span className="block text-xs text-ink-mute">{s.reason}</span>
-                      </span>
-                    </button>
-                  ))}
-                </div>
+            {count === 0 ? (
+              <div className="mt-5 rounded-xl border border-dashed border-paper-edge bg-paper px-4 py-8 text-center">
+                <p className="text-sm text-ink-soft">Add a few places and we&apos;ll arrange them into days.</p>
               </div>
+            ) : (
+              <>
+                {/* Live preview */}
+                {preview && (
+                  <div className="mt-5 border-t border-paper-edge pt-4">
+                    <div className="space-y-4">
+                      {preview.days.map((d) => (
+                        <div key={d.dayNumber}>
+                          <p className="text-sm font-semibold">Day {d.dayNumber} · {d.title}</p>
+                          <ul className="mt-1.5 space-y-1 text-sm text-ink-soft">
+                            {d.activities.map((a, i) => (
+                              <li key={i} className="flex gap-2">
+                                <span className="w-12 shrink-0 font-mono text-xs text-clay-600">{a.time}</span>
+                                <span>{a.title}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggestions */}
+                {suggestions.length > 0 && (
+                  <div className="mt-5 border-t border-paper-edge pt-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-ink-mute">You might add</p>
+                    <div className="mt-2 space-y-1.5">
+                      {suggestions.map((s) => (
+                        <button
+                          key={s.place.id}
+                          onClick={() => toggle(s.place.id)}
+                          className="flex w-full items-start gap-2 rounded-lg border border-paper-edge bg-paper p-2.5 text-left text-sm transition-colors hover:border-clay-400"
+                        >
+                          <span className="mt-0.5 text-clay-500">＋</span>
+                          <span>
+                            <span className="font-medium">{s.place.name}</span>
+                            <span className="block text-xs text-ink-mute">{s.reason}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             <button
@@ -214,29 +224,55 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
               disabled={!preview || saving}
               className="btn-clay mt-5 w-full disabled:opacity-40"
             >
-              {saving ? 'Stitching…' : selected.length ? 'Stitch & view trip ▸' : 'Pick a few places first'}
+              {saving ? 'Arranging your days…' : 'See my itinerary'}
             </button>
-          </div>
 
-          {/* Live day preview */}
-          {preview && (
-            <div className="card mt-4 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-ink-mute">Preview · {preview.dates.durationDays} days</p>
-              <div className="mt-3 space-y-4">
-                {preview.days.map((d) => (
-                  <div key={d.dayNumber}>
-                    <p className="font-medium">Day {d.dayNumber}: {d.title}</p>
-                    <ul className="mt-1 space-y-0.5 text-sm text-ink-soft">
-                      {d.activities.map((a, i) => (
-                        <li key={i}><span className="font-mono text-xs text-clay-600">{a.time}</span> {a.title}</li>
-                      ))}
-                    </ul>
+            {/* Flights — quiet, optional, tucked away */}
+            <div className="mt-3 border-t border-paper-edge pt-3">
+              {!showFlights ? (
+                <button
+                  onClick={() => setShowFlights(true)}
+                  className="text-xs text-ink-mute underline-offset-2 hover:text-ink-soft hover:underline"
+                >
+                  Add a flight estimate
+                </button>
+              ) : (
+                <div>
+                  <div className="flex gap-2">
+                    <input
+                      value={origin}
+                      onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+                      placeholder="From (e.g. SFO)"
+                      className="w-full rounded-full border border-paper-edge bg-paper px-3 py-1.5 text-sm outline-none focus:border-clay-400"
+                    />
+                    <button onClick={getFlights} className="btn-ghost shrink-0 px-3 py-1.5 text-sm">Check</button>
                   </div>
-                ))}
-              </div>
+                  {flightMsg && <p className="mt-1.5 text-xs text-ink-mute">{flightMsg}</p>}
+                  {flights.map((f, i) => (
+                    <div key={i} className="mt-2 rounded-lg bg-paper p-2 text-xs text-ink-soft">
+                      <span className="font-medium">{f.outbound.from} → {f.outbound.to}</span> · ~${f.estimatedPriceUsd.toLocaleString()} rt · {f.outbound.durationHours}h
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </aside>
+      </div>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-paper-edge bg-paper/95 px-4 py-3 backdrop-blur lg:hidden">
+        <button
+          onClick={save}
+          disabled={!preview || saving}
+          className="btn-clay flex w-full items-center justify-center gap-2 disabled:opacity-40"
+        >
+          {saving
+            ? 'Arranging your days…'
+            : count === 0
+              ? 'Add a few places to start'
+              : `See my itinerary · ${count} place${count === 1 ? '' : 's'}`}
+        </button>
       </div>
     </div>
   )
@@ -244,34 +280,37 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
 
 function PlaceCard({ place, added, onToggle }: { place: Place; added: boolean; onToggle: () => void }) {
   return (
-    <div className={`card flex flex-col overflow-hidden transition-colors ${added ? 'ring-2 ring-clay-400' : ''}`}>
-      <div className="relative h-32 w-full overflow-hidden">
+    <button
+      onClick={onToggle}
+      className={`card group flex flex-col overflow-hidden text-left transition-all ${
+        added ? 'ring-2 ring-clay-500' : 'hover:ring-1 hover:ring-paper-edge'
+      }`}
+    >
+      <div className="relative h-36 w-full overflow-hidden">
         <CoverImage
           imageKey={`place:${place.id}`}
           fallbackKey={`city:${place.citySlug}`}
           query={`${place.name} ${place.neighborhood}`}
           alt={place.name}
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-0 h-full w-full transition-transform duration-500 group-hover:scale-105"
         />
-        <span className="absolute left-2 top-2 rounded-full bg-paper/90 px-2 py-0.5 text-[11px] font-medium text-ink-soft">
-          {CAT_ICON[place.category]} {place.neighborhood}
-        </span>
-        <button
-          onClick={onToggle}
-          className={`absolute right-2 top-2 ${added ? 'btn px-3 py-1 text-xs bg-moss-500 text-white' : 'btn px-3 py-1 text-xs bg-paper/95 text-ink hover:bg-white'}`}
+        <span
+          className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold shadow-sm transition-colors ${
+            added ? 'bg-moss-500 text-white' : 'bg-paper/95 text-ink'
+          }`}
         >
-          {added ? 'Added ✓' : 'Add'}
-        </button>
+          {added ? '✓ Added' : '＋ Add'}
+        </span>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-baseline justify-between gap-2">
           <h3 className="font-medium leading-tight">{place.name}</h3>
-          <span className="text-xs text-ink-mute">{dollars(place.priceLevel)}</span>
+          <span className="shrink-0 text-xs text-ink-mute">{dollars(place.priceLevel)}</span>
         </div>
-        <p className="mt-2 line-clamp-3 text-sm text-ink-soft">{place.blurb}</p>
-        {place.order && <p className="mt-1 text-xs text-ink-mute"><span className="font-medium">Order:</span> {place.order}</p>}
+        <p className="mt-0.5 text-xs text-ink-mute">{place.neighborhood}</p>
+        <p className="mt-2 line-clamp-2 text-sm text-ink-soft">{place.blurb}</p>
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -279,7 +318,7 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+      className={`rounded-full border px-3 py-1 text-xs font-medium capitalize transition-colors ${
         active ? 'border-clay-500 bg-clay-500 text-white' : 'border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400'
       }`}
     >
@@ -291,9 +330,9 @@ function FilterChip({ active, onClick, children }: { active: boolean; onClick: (
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (n: number) => void }) {
   return (
     <div className="flex items-center gap-2">
-      <button onClick={() => onChange(Math.max(min, value - 1))} className="h-7 w-7 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">−</button>
+      <button onClick={() => onChange(Math.max(min, value - 1))} className="h-7 w-7 rounded-full border border-paper-edge bg-paper-card text-ink-soft transition-colors hover:border-clay-400">−</button>
       <span className="w-5 text-center font-medium">{value}</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} className="h-7 w-7 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">＋</button>
+      <button onClick={() => onChange(Math.min(max, value + 1))} className="h-7 w-7 rounded-full border border-paper-edge bg-paper-card text-ink-soft transition-colors hover:border-clay-400">＋</button>
     </div>
   )
 }

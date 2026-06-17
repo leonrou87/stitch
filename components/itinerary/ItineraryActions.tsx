@@ -1,9 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export function ItineraryActions() {
+// Reads the same localStorage the BookingGroup writes, so the header progress count stays
+// in sync. We only know how many items are booked, not the total bookable count, so the
+// total is passed in from the server-rendered view.
+function bookedCount(slug: string): number {
+  try {
+    return new Set<string>(JSON.parse(localStorage.getItem(`stitch:booked:${slug}`) || '[]')).size
+  } catch {
+    return 0
+  }
+}
+
+export function ItineraryActions({
+  slug,
+  bookableTotal = 0,
+}: {
+  slug?: string
+  bookableTotal?: number
+} = {}) {
   const [copied, setCopied] = useState(false)
+  const [count, setCount] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    if (!slug) return
+    const key = slug
+    setMounted(true)
+    setCount(bookedCount(key))
+    function sync() {
+      setCount(bookedCount(key))
+    }
+    window.addEventListener('stitch:booked-changed', sync)
+    return () => window.removeEventListener('stitch:booked-changed', sync)
+  }, [slug])
 
   async function copy() {
     try {
@@ -15,15 +46,37 @@ export function ItineraryActions() {
     }
   }
 
+  const showProgress = mounted && bookableTotal > 0
+  const pct = showProgress ? Math.round((Math.min(count, bookableTotal) / bookableTotal) * 100) : 0
+  const allDone = showProgress && count >= bookableTotal
+
   return (
-    <div className="flex flex-wrap gap-2">
-      <button onClick={copy} className="btn-ghost">
-        {copied ? 'Link copied' : 'Share'}
-      </button>
-      <button onClick={() => window.print()} className="btn-ghost">Print</button>
-      <a href="/plan" className="btn-ghost" title="Sign-in and saved trips ship with Clerk auth (see README)">
-        Save trip
-      </a>
+    <div className="flex flex-col items-stretch gap-3 sm:items-end">
+      {showProgress && (
+        <div className="w-full sm:w-52">
+          <div className="flex items-baseline justify-between text-xs">
+            <span className={`font-medium ${allDone ? 'text-moss-600' : 'text-ink-soft'}`}>
+              {allDone ? 'All booked' : `${Math.min(count, bookableTotal)} of ${bookableTotal} booked`}
+            </span>
+            <span className="text-ink-mute">{pct}%</span>
+          </div>
+          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-paper-edge">
+            <div
+              className="h-full rounded-full bg-moss-500 transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 sm:justify-end">
+        <button onClick={copy} className="btn-ghost">
+          {copied ? 'Link copied' : 'Share'}
+        </button>
+        <button onClick={() => window.print()} className="btn-ghost">Print</button>
+        <a href="/plan" className="btn-ghost" title="Sign-in and saved trips ship with Clerk auth (see README)">
+          Save trip
+        </a>
+      </div>
     </div>
   )
 }
