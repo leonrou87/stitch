@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MyTripsNav } from '@/components/layout/MyTripsNav'
 
 // One primary path: browse curated trips. Building your own is the quiet secondary.
 // Everything else lives on the landing page and in the footer to keep the nav calm.
@@ -15,6 +16,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="flex items-center gap-4 text-sm sm:gap-6">
+          <span className="hidden sm:inline"><MyTripsNav /></span>
           <Link
             href="/build"
             className="hidden text-ink-soft transition-colors duration-200 hover:text-clay-700 sm:inline"

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getItineraryBySlug, incrementView } from '@/lib/db/store'
 import { ItineraryView } from '@/components/itinerary/ItineraryView'
+import { RecordTrip } from '@/components/trips/RecordTrip'
 import { itineraryStructuredData } from '@/lib/seo/structured-data'
 
 interface Props { params: Promise<{ slug: string }> }
@@ -34,6 +35,12 @@ export default async function ItineraryPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <ItineraryView itinerary={record.data} itineraryId={record.id} slug={slug} />
       <div className="container-wide mx-auto max-w-prose">
+        <RecordTrip
+          slug={slug}
+          title={`${record.data.dates.durationDays} days in ${record.data.destination.primaryCity}`}
+          city={record.data.destination.primaryCity}
+          days={record.data.dates.durationDays}
+        />
         <div className="card mt-4 flex flex-col items-start gap-3 p-6">
           <h3 className="font-serif text-xl">Want to change it?</h3>
           <p className="text-ink-soft">
