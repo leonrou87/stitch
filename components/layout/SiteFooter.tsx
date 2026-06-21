@@ -5,6 +5,8 @@ const explore = [
   ['Destinations', '/guide'],
   ['How it works', '/about'],
   ['Build a trip', '/build'],
+  ['Help', '/help'],
+  ['Contact', '/contact'],
 ] as const
 
 const legal = [

@@ -6,7 +6,29 @@ export const metadata = { title: 'Affiliate dashboard', robots: { index: false }
 // Local affiliate funnel: which providers are getting clicks. Not auth-protected — it's an
 // operator view. Lock it behind auth before relying on it; partner dashboards are the source
 // of truth for payouts. See AFFILIATE-SETUP.md.
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ key?: string }>
+}) {
+  const adminKey = process.env.STITCH_ADMIN_KEY
+  const { key } = await searchParams
+  const locked = Boolean(adminKey)
+
+  if (locked && key !== adminKey) {
+    return (
+      <div className="container-prose py-24 text-center">
+        <p className="font-serif text-6xl text-clay-400" aria-hidden>
+          ✦
+        </p>
+        <h1 className="mt-4 font-serif text-3xl">Not authorized.</h1>
+        <p className="mt-3 text-ink-soft">
+          This page is restricted. Add a valid access key to view it.
+        </p>
+      </div>
+    )
+  }
+
   const [{ byProvider, totalClicks }, trips] = await Promise.all([
     clickStatsByProvider(),
     listItineraries({}),
@@ -14,6 +36,11 @@ export default async function AdminPage() {
 
   return (
     <div className="container-wide py-14">
+      {!locked && (
+        <div className="card mb-6 border-clay-400 p-4 text-sm text-clay-700">
+          Set <code className="rounded bg-paper px-1">STITCH_ADMIN_KEY</code> to lock this page.
+        </div>
+      )}
       <h1 className="font-serif text-4xl">Affiliate dashboard</h1>
       <p className="mt-2 text-sm text-ink-mute">
         Click funnel. Real earnings are reported in each partner&apos;s own dashboard — see

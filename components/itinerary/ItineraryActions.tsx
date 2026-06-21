@@ -46,6 +46,27 @@ export function ItineraryActions({
     }
   }
 
+  function emailTrip() {
+    const title = (typeof document !== 'undefined' && document.title.split(' · ')[0]) || 'A trip'
+    const url = window.location.href
+    const subject = encodeURIComponent(`${title} — a trip I planned on Stitch`)
+    const body = encodeURIComponent(`Take a look at this trip:\n\n${title}\n${url}\n\nBuilt on Stitch.`)
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+  }
+
+  async function share() {
+    // Native share sheet on mobile (lets you forward to anyone), copy-link fallback.
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: document.title, url: window.location.href })
+        return
+      } catch {
+        /* cancelled; fall through to copy */
+      }
+    }
+    void copy()
+  }
+
   const showProgress = mounted && bookableTotal > 0
   const pct = showProgress ? Math.round((Math.min(count, bookableTotal) / bookableTotal) * 100) : 0
   const allDone = showProgress && count >= bookableTotal
@@ -69,13 +90,11 @@ export function ItineraryActions({
         </div>
       )}
       <div className="flex flex-wrap gap-2 sm:justify-end">
-        <button onClick={copy} className="btn-ghost">
+        <button onClick={share} className="btn-ghost">
           {copied ? 'Link copied' : 'Share'}
         </button>
+        <button onClick={emailTrip} className="btn-ghost">Email</button>
         <button onClick={() => window.print()} className="btn-ghost">Print</button>
-        <a href="/plan" className="btn-ghost" title="Sign-in and saved trips ship with Clerk auth (see README)">
-          Save trip
-        </a>
       </div>
     </div>
   )
