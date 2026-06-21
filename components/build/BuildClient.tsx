@@ -21,6 +21,7 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
   const [selected, setSelected] = useState<string[]>([])
   const [cat, setCat] = useState<PlaceCategory | 'all'>('all')
   const [hood, setHood] = useState<string>('all')
+  const [showAreas, setShowAreas] = useState(false)
   const [query, setQuery] = useState('')
   const [duration, setDuration] = useState(3)
   const [pace, setPace] = useState<'slow' | 'moderate' | 'packed'>('moderate')
@@ -98,40 +99,55 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
 
   const count = selected.length
 
+  const areaActive = hood !== 'all'
+
   return (
-    <div className="container-wide py-8 pb-28 lg:pb-8">
-      {/* One-line instruction */}
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl">{cityName}</h1>
-        <p className="mt-1 text-lg text-ink-soft">Pick a few places. We arrange them into days.</p>
+    <div className="container-wide py-10 pb-28 lg:pb-10">
+      {/* One-line instruction — the whole task in a sentence */}
+      <div className="mb-8 max-w-prose">
+        <p className="text-xs font-semibold uppercase tracking-widest text-clay-600">Build your own</p>
+        <h1 className="mt-2 font-serif text-3xl">{cityName}</h1>
+        <p className="mt-2 text-lg text-ink-soft">Pick a few places you like. We arrange them into a day-by-day plan as you go.</p>
       </div>
 
       <div className="grid items-start gap-10 lg:grid-cols-[1fr_360px]">
         {/* Catalog */}
         <div>
-          {/* Calm, single-row filters */}
-          <div className="sticky top-16 z-10 -mx-1 mb-5 space-y-2.5 bg-paper/85 px-1 py-3 backdrop-blur">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${cityName}`}
-              className="w-full rounded-full border border-paper-edge bg-paper-card px-4 py-2.5 text-sm outline-none transition-colors focus:border-clay-400"
-            />
-            <div className="flex flex-wrap items-center gap-1.5">
+          {/* One calm row: search + type, with areas tucked behind a toggle */}
+          <div className="sticky top-16 z-10 -mx-1 mb-6 bg-paper/90 px-1 py-3 backdrop-blur">
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={`Search ${cityName}`}
+                className="min-w-[180px] flex-1 rounded-full border border-paper-edge bg-paper-card px-4 py-2 text-sm outline-none transition-colors focus:border-clay-400"
+              />
+              <button
+                onClick={() => setShowAreas((v) => !v)}
+                className={`rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
+                  areaActive || showAreas ? 'border-clay-500 bg-clay-50 text-clay-700' : 'border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400'
+                }`}
+              >
+                {areaActive ? hood : 'Areas'}
+              </button>
+            </div>
+            <div className="mt-2.5 flex flex-nowrap items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <FilterChip active={cat === 'all'} onClick={() => setCat('all')}>All types</FilterChip>
               {categories.map((c) => (
                 <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>{CAT_LABEL[c]}</FilterChip>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <FilterChip active={hood === 'all'} onClick={() => setHood('all')}>All areas</FilterChip>
-              {neighborhoods.map((n) => (
-                <FilterChip key={n} active={hood === n} onClick={() => setHood(n)}>{n}</FilterChip>
-              ))}
-            </div>
+            {showAreas && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-paper-edge pt-2.5">
+                <FilterChip active={hood === 'all'} onClick={() => setHood('all')}>All areas</FilterChip>
+                {neighborhoods.map((n) => (
+                  <FilterChip key={n} active={hood === n} onClick={() => setHood(n)}>{n}</FilterChip>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {filtered.map((p) => (
               <PlaceCard key={p.id} place={p} added={selected.includes(p.id)} onToggle={() => toggle(p.id)} />
             ))}
@@ -141,7 +157,7 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
           )}
         </div>
 
-        {/* Tray */}
+        {/* Tray — calm "Your trip" panel */}
         <aside className="lg:sticky lg:top-16 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pb-8">
           <div className="card p-5">
             <div className="flex items-baseline justify-between">
@@ -166,22 +182,23 @@ export function BuildClient({ citySlug, cityName }: { citySlug: string; cityName
             </div>
 
             {count === 0 ? (
-              <div className="mt-5 rounded-xl border border-dashed border-paper-edge bg-paper px-4 py-8 text-center">
-                <p className="text-sm text-ink-soft">Add a few places and we&apos;ll arrange them into days.</p>
+              <div className="mt-5 rounded-xl border border-dashed border-paper-edge bg-paper px-4 py-10 text-center">
+                <p className="text-sm text-ink-soft">Add a few places from the left. Your days will take shape here.</p>
               </div>
             ) : (
               <>
                 {/* Live preview */}
                 {preview && (
-                  <div className="mt-5 border-t border-paper-edge pt-4">
-                    <div className="space-y-4">
+                  <div className="mt-5 border-t border-paper-edge pt-5">
+                    <div className="space-y-5">
                       {preview.days.map((d) => (
                         <div key={d.dayNumber}>
-                          <p className="text-sm font-semibold">Day {d.dayNumber} · {d.title}</p>
-                          <ul className="mt-1.5 space-y-1 text-sm text-ink-soft">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-clay-600">Day {d.dayNumber}</p>
+                          <p className="mt-0.5 text-sm font-medium">{d.title}</p>
+                          <ul className="mt-2 space-y-1.5 text-sm text-ink-soft">
                             {d.activities.map((a, i) => (
-                              <li key={i} className="flex gap-2">
-                                <span className="w-12 shrink-0 font-mono text-xs text-clay-600">{a.time}</span>
+                              <li key={i} className="flex gap-2.5">
+                                <span className="w-12 shrink-0 font-mono text-xs text-ink-mute">{a.time}</span>
                                 <span>{a.title}</span>
                               </li>
                             ))}
@@ -280,11 +297,12 @@ function PlaceCard({ place, added, onToggle }: { place: Place; added: boolean; o
   return (
     <button
       onClick={onToggle}
-      className={`card group flex flex-col overflow-hidden text-left transition-all ${
-        added ? 'ring-2 ring-clay-500' : 'hover:ring-1 hover:ring-paper-edge'
+      aria-pressed={added}
+      className={`group flex items-stretch gap-3 overflow-hidden rounded-xl border bg-paper-card p-2 text-left transition-colors ${
+        added ? 'border-clay-500 bg-clay-50' : 'border-paper-edge hover:border-clay-400'
       }`}
     >
-      <div className="relative h-36 w-full overflow-hidden">
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
         <CoverImage
           imageKey={`place:${place.id}`}
           fallbackKey={`city:${place.citySlug}`}
@@ -292,22 +310,23 @@ function PlaceCard({ place, added, onToggle }: { place: Place; added: boolean; o
           alt={place.name}
           className="absolute inset-0 h-full w-full transition-transform duration-500 group-hover:scale-105"
         />
-        <span
-          className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold shadow-sm transition-colors ${
-            added ? 'bg-moss-500 text-white' : 'bg-paper/95 text-ink'
-          }`}
-        >
-          {added ? '✓ Added' : '＋ Add'}
-        </span>
       </div>
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex min-w-0 flex-1 flex-col py-0.5 pr-1">
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="font-medium leading-tight">{place.name}</h3>
+          <h3 className="truncate font-medium leading-tight">{place.name}</h3>
           <span className="shrink-0 text-xs text-ink-mute">{dollars(place.priceLevel)}</span>
         </div>
         <p className="mt-0.5 text-xs text-ink-mute">{place.neighborhood}</p>
-        <p className="mt-2 line-clamp-2 text-sm text-ink-soft">{place.blurb}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{place.blurb}</p>
       </div>
+      <span
+        className={`flex w-9 shrink-0 items-center justify-center self-stretch rounded-lg text-base transition-colors ${
+          added ? 'bg-moss-500 text-white' : 'bg-paper text-ink-mute group-hover:text-clay-600'
+        }`}
+        aria-hidden
+      >
+        {added ? '✓' : '＋'}
+      </span>
     </button>
   )
 }

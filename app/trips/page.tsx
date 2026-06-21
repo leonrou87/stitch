@@ -18,8 +18,8 @@ export default function TripsPage() {
     <div className="container-wide py-14">
       <h1 className="font-serif text-4xl">Curated trips</h1>
       <p className="mt-3 max-w-prose text-ink-soft">
-        Short on time? Start from a ready-made trip with a clear theme. Tap <span className="font-medium">Use this trip</span> for
-        a finished itinerary in one go, or <span className="font-medium">Tweak</span> to adjust the picks first.
+        Ready-made trips with a clear theme. Tap <span className="font-medium">Use this trip</span> for
+        a finished itinerary in one go, or <span className="font-medium">Edit</span> to adjust the picks first.
       </p>
 
       {Object.entries(byCity).map(([slug, list]) => {

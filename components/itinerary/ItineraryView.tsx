@@ -5,12 +5,6 @@ import { formatBudgetRange, travelerLine, middot } from '@/lib/utils'
 import { CoverImage } from '@/components/ui/CoverImage'
 import { destinationByCity } from '@/lib/data/destinations'
 
-const TYPE_ICON: Record<string, string> = {
-  explore: '🚶', museum: '🏛', gallery: '🖼', restaurant: '🍽', cafe: '☕', bar: '🍸',
-  shopping: '🛍', experience: '✨', outdoor: '⛰', transport: '🚆', rest: '🛏',
-  show: '🎭', class: '🎓', sightseeing: '📸', nightlife: '🌃', other: '•',
-}
-
 // Count every bookable cluster on the page so the header progress bar knows its denominator.
 // One AffiliateButtons with >=1 link renders exactly one BookingGroup / one tickable item.
 function countBookable(it: Itinerary): number {
@@ -28,12 +22,7 @@ function countBookable(it: Itinerary): number {
 }
 
 function SectionRule({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="section-rule mb-5 mt-14 text-sm font-semibold uppercase tracking-widest">
-      <span aria-hidden>✦</span>
-      {children}
-    </h2>
-  )
+  return <h2 className="section-rule mb-5 mt-16">{children}</h2>
 }
 
 export function ItineraryView({
@@ -87,7 +76,7 @@ export function ItineraryView({
               {budget && <span className="chip">Est. {budget}</span>}
               {it.preferences.pace && <span className="chip capitalize">{it.preferences.pace} pace</span>}
             </div>
-            <p className="mt-5 max-w-prose font-serif text-lg leading-relaxed text-ink-soft">{it.summary}</p>
+            <p className="mt-5 font-serif text-lg leading-relaxed text-ink-soft">{it.summary}</p>
           </div>
           <ItineraryActions slug={slug} bookableTotal={bookableTotal} />
         </div>
@@ -123,6 +112,12 @@ export function ItineraryView({
 
           {it.gettingAround && <GettingAround it={it} />}
           {it.practical && <Practical it={it} />}
+
+          {bookableTotal > 0 && (
+            <p className="mt-16 text-xs text-ink-mute">
+              Booking buttons are affiliate links. Stitch may earn a commission, at no extra cost to you.
+            </p>
+          )}
         </div>
       </div>
     </article>
@@ -233,8 +228,8 @@ function DayBlock({ day, itineraryId, slug }: { day: Day; itineraryId: string | 
   return (
     <section className="break-inside-avoid">
       <SectionRule>Day {day.dayNumber}: {day.title}</SectionRule>
-      <p className="-mt-2 mb-6 font-serif text-lg leading-relaxed text-ink-soft">{day.narrative}</p>
-      <ol className="relative ml-2.5 space-y-7 border-l border-paper-edge pl-7">
+      <p className="mb-7 font-serif text-lg leading-relaxed text-ink-soft">{day.narrative}</p>
+      <ol className="relative ml-1.5 space-y-8 border-l border-paper-edge pl-7">
         {day.activities.map((a, i) => <ActivityItem key={i} a={a} itineraryId={itineraryId} slug={slug} />)}
       </ol>
     </section>
@@ -244,9 +239,7 @@ function DayBlock({ day, itineraryId, slug }: { day: Day; itineraryId: string | 
 function ActivityItem({ a, itineraryId, slug }: { a: Activity; itineraryId: string | null; slug: string }) {
   return (
     <li className="relative">
-      <span className="absolute -left-[39px] top-0.5 grid h-6 w-6 place-items-center rounded-full bg-paper text-xs shadow-sm ring-1 ring-paper-edge">
-        {TYPE_ICON[a.type] ?? '•'}
-      </span>
+      <span className="absolute -left-[35px] top-2 h-2.5 w-2.5 rounded-full bg-clay-400 ring-4 ring-paper" />
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         {a.time && <span className="font-mono text-sm font-medium text-clay-600">{a.time}</span>}
         <h4 className="font-medium">{a.title}</h4>
@@ -257,7 +250,6 @@ function ActivityItem({ a, itineraryId, slug }: { a: Activity; itineraryId: stri
       {a.location?.name && (
         <p className="mt-0.5 text-sm text-ink-mute">
           {a.location.name}{a.location.neighborhood ? ` · ${a.location.neighborhood}` : ''}
-          {a.location.address ? ` · ${a.location.address}` : ''}
         </p>
       )}
       <p className="mt-1.5 text-ink-soft">{a.description}</p>

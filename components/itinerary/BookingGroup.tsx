@@ -57,56 +57,63 @@ export function BookingGroup({
 
   if (!links.length) return null
 
+  const tick = (
+    <button
+      onClick={toggle}
+      aria-pressed={booked}
+      aria-label={booked ? 'Mark as not booked' : 'Mark as booked'}
+      className={`btn px-3.5 py-2 text-sm ${
+        booked
+          ? 'bg-moss-500 text-white hover:bg-moss-600'
+          : 'border border-paper-edge bg-paper-card text-ink-soft hover:border-moss-500 hover:text-moss-600'
+      }`}
+    >
+      {!mounted ? (
+        'Mark booked'
+      ) : booked ? (
+        <><CheckIcon /> Booked <span className="opacity-75">· undo</span></>
+      ) : (
+        <><CircleIcon /> Mark booked</>
+      )}
+    </button>
+  )
+
+  const linkButtons = links.map((l, i) => (
+    <a
+      key={i}
+      href={l.href}
+      target="_blank"
+      rel="nofollow sponsored noopener"
+      className={`${i === 0 && !booked ? 'btn-clay' : 'btn-ghost'} ${booked ? 'opacity-70' : ''}`}
+    >
+      {l.label}
+    </a>
+  ))
+
+  // Compact: a quiet inline row under an activity, restaurant, flight, or stay option.
+  if (compact) {
+    return (
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {linkButtons}
+        {tick}
+      </div>
+    )
+  }
+
+  // Full: a framed booking panel for the pre-trip "sort before you go" cluster.
   return (
     <div
-      className={[
-        compact ? 'mt-3' : 'mt-4 rounded-xl border p-4',
-        compact ? '' : booked ? 'border-moss-500/40 bg-moss-500/5' : 'border-paper-edge bg-paper',
-        'transition-colors',
-      ].join(' ')}
+      className={`mt-4 rounded-xl border p-4 transition-colors ${
+        booked ? 'border-moss-500/40 bg-moss-500/5' : 'border-paper-edge bg-paper'
+      }`}
     >
       <div className="flex flex-wrap items-center gap-2">
-        {!compact && (
-          <span className="mr-1 text-sm font-medium text-ink-soft">
-            {booked ? 'Booked' : label}
-          </span>
-        )}
-        {links.map((l, i) => (
-          <a
-            key={i}
-            href={l.href}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            className={`${i === 0 && !booked ? 'btn-clay' : 'btn-ghost'} ${booked ? 'opacity-70' : ''}`}
-          >
-            {l.label}
-          </a>
-        ))}
-        <button
-          onClick={toggle}
-          aria-pressed={booked}
-          aria-label={booked ? 'Mark as not booked' : 'Mark as booked'}
-          className={`btn px-3.5 py-2 text-sm transition-colors ${
-            booked
-              ? 'bg-moss-500 text-white hover:bg-moss-600'
-              : 'border border-paper-edge bg-paper-card text-ink-soft hover:border-moss-500 hover:text-moss-600'
-          }`}
-        >
-          {!mounted ? (
-            'Mark booked'
-          ) : booked ? (
-            <>
-              <CheckIcon /> Booked
-              <span className="opacity-80">· undo</span>
-            </>
-          ) : (
-            <>
-              <CircleIcon /> Mark booked
-            </>
-          )}
-        </button>
+        <span className={`mr-1 text-sm font-medium ${booked ? 'text-moss-600' : 'text-ink-soft'}`}>
+          {booked ? 'Booked' : label}
+        </span>
+        {linkButtons}
+        {tick}
       </div>
-      <p className="mt-2 text-[11px] uppercase tracking-wide text-ink-mute">affiliate links</p>
     </div>
   )
 }

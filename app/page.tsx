@@ -29,15 +29,12 @@ export default function HomePage() {
       {/* Hero */}
       <section className="container-wide pb-12 pt-20 sm:pt-28">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-600">
-            Travel planning, done for you
-          </p>
-          <h1 className="mt-4 font-serif text-5xl leading-[1.05] sm:text-6xl">
+          <h1 className="font-serif text-5xl leading-[1.05] sm:text-6xl">
             A trip you can book in an afternoon.
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-ink-soft">
-            Pick a ready-made trip or build your own from real, named places. You get a
-            day-by-day itinerary you book from one page. Free, no signup.
+            Start from a curated trip, get a day-by-day itinerary, and book it from one page.
+            Real, named places. Free, no signup.
           </p>
         </div>
         <HomeHero />
@@ -49,7 +46,7 @@ export default function HomePage() {
           <div>
             <h2 className="font-serif text-3xl">Start with a curated trip</h2>
             <p className="mt-2 max-w-prose text-ink-soft">
-              Themed and ready. Tap one for a finished itinerary, or tweak it first.
+              Themed and ready. Use one as-is, or edit the picks first.
             </p>
           </div>
           <Link href="/trips" className="shrink-0 text-sm text-clay-600 hover:underline">

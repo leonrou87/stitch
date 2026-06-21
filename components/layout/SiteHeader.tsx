@@ -1,11 +1,7 @@
 import Link from 'next/link'
 
-const navLinks = [
-  ['Curated trips', '/trips'],
-  ['Destinations', '/guide'],
-  ['How it works', '/about'],
-] as const
-
+// One primary path: browse curated trips. Building your own is the quiet secondary.
+// Everything else lives on the landing page and in the footer to keep the nav calm.
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-paper-edge/70 bg-paper/80 backdrop-blur">
@@ -18,20 +14,15 @@ export function SiteHeader() {
           <span className="font-serif text-xl tracking-tight">Stitch</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm sm:flex">
-          {navLinks.map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-ink-soft transition-colors duration-200 hover:text-clay-700"
-            >
-              {label}
-            </Link>
-          ))}
-          <Link href="/build" className="btn-clay">Build a trip</Link>
+        <nav className="flex items-center gap-4 text-sm sm:gap-6">
+          <Link
+            href="/build"
+            className="hidden text-ink-soft transition-colors duration-200 hover:text-clay-700 sm:inline"
+          >
+            Build your own
+          </Link>
+          <Link href="/trips" className="btn-clay">Browse trips</Link>
         </nav>
-
-        <Link href="/build" className="btn-clay sm:hidden">Build a trip</Link>
       </div>
     </header>
   )

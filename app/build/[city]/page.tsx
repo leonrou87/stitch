@@ -31,17 +31,16 @@ export default async function BuildCityPage({ params }: Props) {
   return (
     <>
       {cityBundles.length > 0 && (
-        <section className="container-wide pt-8">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="font-serif text-2xl">Start from a curated {dest.city} trip</h2>
-              <p className="mt-1 text-sm text-ink-soft">Tap one for a finished itinerary, or build your own below.</p>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="container-wide pt-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-clay-600">Start from a curated trip</p>
+          <h2 className="mt-2 font-serif text-2xl">{dest.city}, already arranged</h2>
+          <p className="mt-1 max-w-prose text-sm text-ink-soft">
+            A finished {dest.city} itinerary in one tap. Or scroll on to choose your own places.
+          </p>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {cityBundles.map((b) => <BundleCard key={b.id} bundle={b} />)}
           </div>
-          <div className="section-rule mt-10 text-sm font-semibold uppercase tracking-widest text-clay-600">
+          <div className="section-rule mt-12 text-xs font-semibold uppercase tracking-widest text-ink-mute">
             <span aria-hidden>✦</span>or build your own
           </div>
         </section>

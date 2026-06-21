@@ -51,16 +51,16 @@ export function ItineraryActions({
   const allDone = showProgress && count >= bookableTotal
 
   return (
-    <div className="flex flex-col items-stretch gap-3 sm:items-end">
+    <div className="flex flex-col items-stretch gap-4 sm:items-end">
       {showProgress && (
-        <div className="w-full sm:w-52">
-          <div className="flex items-baseline justify-between text-xs">
-            <span className={`font-medium ${allDone ? 'text-moss-600' : 'text-ink-soft'}`}>
+        <div className="w-full sm:w-56">
+          <div className="flex items-baseline justify-between text-sm">
+            <span className={`font-medium ${allDone ? 'text-moss-600' : 'text-ink'}`}>
               {allDone ? 'All booked' : `${Math.min(count, bookableTotal)} of ${bookableTotal} booked`}
             </span>
-            <span className="text-ink-mute">{pct}%</span>
+            <span className="text-xs text-ink-mute">{pct}%</span>
           </div>
-          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-paper-edge">
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-paper-edge">
             <div
               className="h-full rounded-full bg-moss-500 transition-all duration-500"
               style={{ width: `${pct}%` }}

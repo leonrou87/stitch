@@ -17,9 +17,9 @@ export function BundleCard({ bundle }: { bundle: Bundle }) {
         <h3 className="font-serif text-xl">{bundle.title}</h3>
         <p className="mt-1 text-xs text-ink-mute">{bundle.durationDays} days · {bundle.pace} pace · {bundle.placeIds.length} places</p>
         <p className="mt-2 flex-1 text-sm text-ink-soft">{bundle.tagline}</p>
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex items-center gap-4">
           <Link href={`/go/${bundle.id}`} className="btn-clay flex-1 text-sm" prefetch={false}>Use this trip</Link>
-          <Link href={bundleHref(bundle, false)} className="btn-ghost text-sm">Edit</Link>
+          <Link href={bundleHref(bundle, false)} className="text-sm text-ink-mute underline-offset-2 hover:text-ink-soft hover:underline">Edit first</Link>
         </div>
       </div>
     </div>
