@@ -88,5 +88,8 @@ export const bundles: Bundle[] = [
 
 export const bundlesForCity = (citySlug: string) => bundles.filter((b) => b.citySlug === citySlug)
 export const bundleById = (id: string) => bundles.find((b) => b.id === id)
-export const bundleHref = (b: Bundle, go = false) =>
-  `/build/${b.citySlug}?add=${b.placeIds.join(',')}${go ? '&go=1' : ''}`
+
+// Open a curated trip in the wizard, pre-filled. `step` controls where you land:
+// 'review' (default) to adjust dates and book straight away, 'do' to tweak the picks first.
+export const bundleHref = (b: Bundle, step: 'review' | 'do' = 'review') =>
+  `/build/${b.citySlug}?add=${b.placeIds.join(',')}&days=${b.durationDays}&pace=${b.pace}&step=${step}`
