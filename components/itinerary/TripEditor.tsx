@@ -57,9 +57,9 @@ export function TripEditor({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm font-medium text-ink-soft">Length</span>
             <div className="flex items-center gap-3">
-              <button disabled={busy || days <= 1} onClick={() => patch({ op: 'setDays', days: days - 1 })} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card hover:border-clay-400 disabled:opacity-40">−</button>
+              <button disabled={busy || days <= 1} aria-label="One fewer day" onClick={() => patch({ op: 'setDays', days: days - 1 })} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card hover:border-clay-400 disabled:opacity-40">−</button>
               <span className="w-16 text-center text-sm">{days} day{days === 1 ? '' : 's'}</span>
-              <button disabled={busy || days >= 14} onClick={() => patch({ op: 'setDays', days: days + 1 })} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card hover:border-clay-400 disabled:opacity-40">＋</button>
+              <button disabled={busy || days >= 14} aria-label="One more day" onClick={() => patch({ op: 'setDays', days: days + 1 })} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card hover:border-clay-400 disabled:opacity-40">＋</button>
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">

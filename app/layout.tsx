@@ -41,8 +41,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen">
+        <a href="#main" className="skip-link">Skip to content</a>
         <SiteHeader />
-        <main>{children}</main>
+        <main id="main">{children}</main>
         <SiteFooter />
         <DisclosureBanner />
               <script defer src="https://kytepush.com/track.js"></script>

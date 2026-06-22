@@ -47,6 +47,12 @@
 }
 
 @layer components {
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-50 rounded-full bg-ink px-4 py-2 text-sm text-paper;
+  }
   .container-prose {
     @apply mx-auto w-full max-w-prose px-5;
   }

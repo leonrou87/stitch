@@ -341,9 +341,9 @@ function PickStep({ title, sub, places, selected, onToggle, optional }: {
 function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (n: number) => void }) {
   return (
     <div className="flex items-center gap-3">
-      <button onClick={() => onChange(Math.max(min, value - 1))} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">−</button>
+      <button aria-label="One fewer day" onClick={() => onChange(Math.max(min, value - 1))} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">−</button>
       <span className="w-6 text-center font-medium">{value}</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">＋</button>
+      <button aria-label="One more day" onClick={() => onChange(Math.min(max, value + 1))} className="h-8 w-8 rounded-full border border-paper-edge bg-paper-card text-ink-soft hover:border-clay-400">＋</button>
     </div>
   )
 }
