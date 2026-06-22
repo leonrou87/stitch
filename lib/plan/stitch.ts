@@ -148,13 +148,16 @@ function buildDay(group: Place[], dayNumber: number, startDate?: string): Day {
   const hoods = uniq(group.map((p) => p.neighborhood))
   const title = hoods.length === 1 ? hoods[0] : `${hoods[0]} & ${hoods[1]}`
   const dateStr = startDate ? addDays(startDate, dayNumber - 1) : undefined
+  const acts = activities.length ? activities : [toActivity(group[0], '10:00')]
+  const dailyBudgetUsd = acts.reduce((sum, a) => sum + (a.costEstimateUsd ?? 0), 0)
 
   return {
     dayNumber,
     date: dateStr,
     title,
     narrative: buildDayNarrative(group, hoods),
-    activities: activities.length ? activities : [toActivity(group[0], '10:00')],
+    activities: acts,
+    dailyBudgetUsd: dailyBudgetUsd > 0 ? dailyBudgetUsd : undefined,
   }
 }
 

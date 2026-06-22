@@ -74,6 +74,7 @@ export function ItineraryView({
               <span className="chip">{travelerLine(it.travelers.adults, it.travelers.children)}</span>
               <span className="chip">{dateLine}</span>
               {budget && <span className="chip">Est. {budget}</span>}
+              {(() => { const t = it.days.reduce((s, d) => s + dayBudget(d), 0); return t > 0 ? <span className="chip">~${t} food &amp; entries</span> : null })()}
               {it.preferences.pace && <span className="chip capitalize">{it.preferences.pace} pace</span>}
             </div>
             <p className="mt-5 font-serif text-lg leading-relaxed text-ink-soft">{it.summary}</p>
@@ -224,11 +225,19 @@ function Stays({ stays, itineraryId, slug }: { stays: Stay[]; itineraryId: strin
   )
 }
 
+export function dayBudget(day: Day): number {
+  return day.dailyBudgetUsd ?? day.activities.reduce((s, a) => s + (a.costEstimateUsd ?? 0), 0)
+}
+
 function DayBlock({ day, itineraryId, slug }: { day: Day; itineraryId: string | null; slug: string }) {
+  const total = dayBudget(day)
   return (
     <section className="break-inside-avoid">
       <SectionRule>Day {day.dayNumber}: {day.title}</SectionRule>
-      <p className="mb-7 font-serif text-lg leading-relaxed text-ink-soft">{day.narrative}</p>
+      <p className="mb-2 font-serif text-lg leading-relaxed text-ink-soft">{day.narrative}</p>
+      {total > 0 && (
+        <p className="mb-7 text-sm text-ink-mute">Estimated <span className="font-medium text-ink-soft">~${total}</span> in entries and food this day, before stays.</p>
+      )}
       <ol className="relative ml-1.5 space-y-8 border-l border-paper-edge pl-7">
         {day.activities.map((a, i) => <ActivityItem key={i} a={a} itineraryId={itineraryId} slug={slug} />)}
       </ol>
