@@ -5,6 +5,7 @@ import { getItineraryBySlug, incrementView } from '@/lib/db/store'
 import { ItineraryView } from '@/components/itinerary/ItineraryView'
 import { RecordTrip } from '@/components/trips/RecordTrip'
 import { TripEditor } from '@/components/itinerary/TripEditor'
+import { EmailTrip } from '@/components/trips/EmailTrip'
 import { itineraryStructuredData } from '@/lib/seo/structured-data'
 
 interface Props { params: Promise<{ slug: string }> }
@@ -56,12 +57,12 @@ export default async function ItineraryPage({ params }: Props) {
           }))}
         />
         <div className="card mt-4 flex flex-col items-start gap-3 p-6">
-          <h3 className="font-serif text-xl">Want to change it?</h3>
+          <h3 className="font-serif text-xl">Keep this trip</h3>
           <p className="text-ink-soft">
-            Add or drop places, change the pace, add days — and re-stitch. Your booked check-offs
-            are saved on this device.
+            It&apos;s saved to your trips on this device, and lives at this link to share. Want it in your inbox too?
           </p>
-          <Link href="/build" className="btn-clay">Build another trip</Link>
+          <EmailTrip slug={slug} title={`${record.data.dates.durationDays} days in ${record.data.destination.primaryCity}`} />
+          <Link href="/build" className="mt-2 text-sm text-clay-600 hover:underline">Plan another trip →</Link>
         </div>
       </div>
     </>

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { getSupabase } from '@/lib/db/supabase'
+import { sendEmail } from '@/lib/email/send'
 
 export const runtime = 'nodejs'
 
@@ -34,39 +35,16 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const resendKey = process.env.RESEND_API_KEY
-  if (resendKey) {
-    try {
-      const to = process.env.SUPPORT_FORWARD_EMAIL || 'leonrou87@gmail.com'
-      const lines = [
-        `Kind: ${kind}`,
-        `Name: ${name || '—'}`,
-        `Email: ${email || '—'}`,
-        tripSlug ? `Trip: ${tripSlug}` : '',
-        '',
-        message,
-      ]
-        .filter((line) => line !== null)
-        .join('\n')
-
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'Stitch <onboarding@resend.dev>',
-          to: [to],
-          reply_to: email || undefined,
-          subject: `Stitch ${kind} message${name ? ` from ${name}` : ''}`,
-          text: lines,
-        }),
-      })
-    } catch {
-      // Forwarding is best-effort; the message is already captured above.
-    }
-  }
+  // Forward to the owner's inbox (best-effort; the message is already captured above).
+  const text = [`Kind: ${kind}`, `Name: ${name || '—'}`, `Email: ${email || '—'}`, tripSlug ? `Trip: ${tripSlug}` : '', '', message]
+    .filter(Boolean)
+    .join('\n')
+  await sendEmail({
+    to: process.env.SUPPORT_FORWARD_EMAIL || 'leonrou87@gmail.com',
+    subject: `Stitch ${kind} message${name ? ` from ${name}` : ''}`,
+    text,
+    replyTo: email || undefined,
+  })
 
   return Response.json({ ok: true })
 }
