@@ -5,6 +5,7 @@ import { attachAffiliateLinks } from '@/lib/affiliate/registry'
 import { saveItinerary } from '@/lib/db/store'
 import { generateSlug } from '@/lib/seo/slug'
 import { TripRequestSchema } from '@/lib/types/request'
+import { currentUserId } from '@/lib/auth/clerk'
 
 export const runtime = 'nodejs'
 
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   itinerary = await attachAffiliateLinks(itinerary, req)
 
   const slug = generateSlug(itinerary)
-  const saved = await saveItinerary({ slug, data: itinerary })
+  const ownerId = await currentUserId()
+  const saved = await saveItinerary({ slug, data: itinerary, ownerId })
   return Response.redirect(new URL(`/i/${saved.slug}`, request.url), 303)
 }

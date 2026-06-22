@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MyTripsNav } from '@/components/layout/MyTripsNav'
+import { AuthButtons } from '@/components/layout/AuthButtons'
 
 // One primary path: browse curated trips. Building your own is the quiet secondary.
 // Everything else lives on the landing page and in the footer to keep the nav calm.
@@ -24,6 +25,7 @@ export function SiteHeader() {
             Build your own
           </Link>
           <Link href="/trips" className="btn-clay">Browse trips</Link>
+          <AuthButtons />
         </nav>
       </div>
     </header>

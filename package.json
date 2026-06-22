@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
+    "@clerk/nextjs": "^7.5.7",
     "@supabase/supabase-js": "^2.108.2",
     "drizzle-orm": "^0.36.4",
     "next": "^15.5.19",

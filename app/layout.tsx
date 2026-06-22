@@ -3,6 +3,7 @@ import './globals.css'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { DisclosureBanner } from '@/components/layout/DisclosureBanner'
+import { clerkEnabled } from '@/lib/auth/clerk'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
@@ -28,8 +29,8 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const tree = (
     <html lang="en">
       <head>
         {/* TravelPayouts site verification + tracking (project 540243). Rendered in the
@@ -50,4 +51,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   )
+
+  if (clerkEnabled) {
+    const { ClerkProvider } = await import('@clerk/nextjs')
+    return <ClerkProvider>{tree}</ClerkProvider>
+  }
+  return tree
 }

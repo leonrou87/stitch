@@ -23,6 +23,7 @@ export interface ItineraryRecord {
   vibeTags: string[]
   viewCount: number
   generatedAt: string
+  ownerId: string | null
 }
 
 // ---------- JSON fallback helpers ----------
@@ -51,6 +52,7 @@ function rowToRecord(r: Record<string, unknown>): ItineraryRecord {
     vibeTags: (r.vibe_tags as string[]) ?? [],
     viewCount: Number(r.view_count ?? 0),
     generatedAt: String(r.created_at ?? new Date().toISOString()),
+    ownerId: (r.owner_id as string) ?? null,
   }
 }
 
@@ -59,6 +61,7 @@ export async function saveItinerary(input: {
   slug: string
   data: Itinerary
   isSeoPage?: boolean
+  ownerId?: string | null
 }): Promise<ItineraryRecord> {
   const it = input.data
   const base = {
@@ -70,6 +73,7 @@ export async function saveItinerary(input: {
     travelers_count: it.travelers.adults + it.travelers.children.length,
     vibe_tags: it.preferences.vibeTags,
     is_seo_page: input.isSeoPage ?? false,
+    owner_id: input.ownerId ?? null,
   }
 
   const sb = getSupabase()
@@ -120,6 +124,19 @@ export async function getItineraryBySlug(slug: string): Promise<ItineraryRecord 
   const all = readJson<Record<string, unknown>[]>(ITIN_FILE, [])
   const r = all.find((x) => x.slug === slug)
   return r ? rowToRecord(r) : undefined
+}
+
+export async function listItinerariesByOwner(ownerId: string): Promise<ItineraryRecord[]> {
+  if (!ownerId) return []
+  const sb = getSupabase()
+  if (sb) {
+    const { data } = await sb.from('itineraries').select('*').eq('owner_id', ownerId).order('created_at', { ascending: false })
+    return (data ?? []).map(rowToRecord)
+  }
+  return readJson<Record<string, unknown>[]>(ITIN_FILE, [])
+    .map(rowToRecord)
+    .filter((r) => r.ownerId === ownerId)
+    .sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))
 }
 
 export async function listItineraries(opts: { seoOnly?: boolean; limit?: number } = {}): Promise<ItineraryRecord[]> {

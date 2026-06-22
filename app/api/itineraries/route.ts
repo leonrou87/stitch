@@ -4,6 +4,7 @@ import { TripRequestSchema } from '@/lib/types/request'
 import { attachAffiliateLinks } from '@/lib/affiliate/registry'
 import { saveItinerary } from '@/lib/db/store'
 import { generateSlug } from '@/lib/seo/slug'
+import { currentUserId } from '@/lib/auth/clerk'
 
 export const runtime = 'nodejs'
 
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
 
   const enriched = await attachAffiliateLinks(it, req)
   const slug = generateSlug(enriched)
-  const saved = await saveItinerary({ slug, data: enriched })
+  const ownerId = await currentUserId()
+  const saved = await saveItinerary({ slug, data: enriched, ownerId })
 
   return Response.json({ slug: saved.slug, url: `/i/${saved.slug}` })
 }
