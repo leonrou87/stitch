@@ -16,9 +16,15 @@ export const metadata: Metadata = {
     'Tell us where you want to go. We build a day-by-day itinerary with real places, real prices, and one-click bookings. Free, no signup.',
   openGraph: {
     title: 'Stitch',
-    description: 'Plan a trip that’s actually yours.',
+    description: 'A trip you can book in an afternoon.',
     type: 'website',
     url: appUrl,
+    siteName: 'Stitch',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Stitch',
+    description: 'A trip you can book in an afternoon.',
   },
 }
 
