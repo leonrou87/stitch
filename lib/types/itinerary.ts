@@ -203,6 +203,15 @@ export const ItinerarySchema = z.object({
     model: z.string(),
     promptVersion: z.string(),
   }),
+
+  // The picks behind this trip, so it can be re-stitched in place (change days/pace,
+  // add/remove stops) without losing the original selection. Optional for back-compat.
+  source: z.object({
+    citySlug: z.string(),
+    placeIds: z.array(z.string()),
+    pace: z.enum(['slow', 'moderate', 'packed']).optional(),
+    startDate: z.string().optional(),
+  }).optional(),
 })
 
 export type Itinerary = z.infer<typeof ItinerarySchema>

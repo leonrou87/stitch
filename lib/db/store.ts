@@ -87,6 +87,29 @@ export async function saveItinerary(input: {
   return rowToRecord(rec)
 }
 
+export async function updateItinerary(slug: string, data: Itinerary): Promise<ItineraryRecord | undefined> {
+  const patch = {
+    data,
+    destination_city: data.destination.primaryCity,
+    destination_country: data.destination.country,
+    duration_days: data.dates.durationDays,
+    travelers_count: data.travelers.adults + data.travelers.children.length,
+    vibe_tags: data.preferences.vibeTags,
+  }
+  const sb = getSupabase()
+  if (sb) {
+    const { data: row, error } = await sb.from('itineraries').update(patch).eq('slug', slug).select().single()
+    if (error || !row) return undefined
+    return rowToRecord(row)
+  }
+  const all = readJson<Record<string, unknown>[]>(ITIN_FILE, [])
+  const r = all.find((x) => x.slug === slug)
+  if (!r) return undefined
+  Object.assign(r, patch)
+  writeJson(ITIN_FILE, all)
+  return rowToRecord(r)
+}
+
 export async function getItineraryBySlug(slug: string): Promise<ItineraryRecord | undefined> {
   const sb = getSupabase()
   if (sb) {

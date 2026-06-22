@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getItineraryBySlug, incrementView } from '@/lib/db/store'
 import { ItineraryView } from '@/components/itinerary/ItineraryView'
 import { RecordTrip } from '@/components/trips/RecordTrip'
+import { TripEditor } from '@/components/itinerary/TripEditor'
 import { itineraryStructuredData } from '@/lib/seo/structured-data'
 
 interface Props { params: Promise<{ slug: string }> }
@@ -40,6 +41,19 @@ export default async function ItineraryPage({ params }: Props) {
           title={`${record.data.dates.durationDays} days in ${record.data.destination.primaryCity}`}
           city={record.data.destination.primaryCity}
           days={record.data.dates.durationDays}
+        />
+        <TripEditor
+          slug={slug}
+          citySlug={record.data.source?.citySlug}
+          placeIds={record.data.source?.placeIds ?? []}
+          days={record.data.dates.durationDays}
+          pace={record.data.preferences.pace}
+          hasSource={Boolean(record.data.source)}
+          editorDays={record.data.days.map((d) => ({
+            dayNumber: d.dayNumber,
+            title: d.title,
+            activities: d.activities.map((a) => ({ title: a.title })),
+          }))}
         />
         <div className="card mt-4 flex flex-col items-start gap-3 p-6">
           <h3 className="font-serif text-xl">Want to change it?</h3>

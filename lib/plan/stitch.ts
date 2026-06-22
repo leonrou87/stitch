@@ -95,6 +95,7 @@ export function stitchItinerary(citySlug: string, places: Place[], opts: StitchO
       commonPhrases: [],
     } : undefined,
     metadata: { generatedAt: new Date().toISOString(), model: 'stitch-engine', promptVersion: PROMPT_VERSION },
+    source: { citySlug, placeIds: picks.map((p) => p.id), pace, startDate: opts.startDate },
   }
   return it
 }
