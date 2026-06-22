@@ -245,7 +245,21 @@ function DayBlock({ day, itineraryId, slug }: { day: Day; itineraryId: string | 
   )
 }
 
+function mapsHref(loc: NonNullable<Activity['location']>): string {
+  const q = typeof loc.lat === 'number' && typeof loc.lng === 'number'
+    ? `${loc.lat},${loc.lng}`
+    : [loc.name, loc.neighborhood].filter(Boolean).join(' ')
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
+}
+
 function ActivityItem({ a, itineraryId, slug }: { a: Activity; itineraryId: string | null; slug: string }) {
+  // stitch flattens catalog order/tip/closed into tips with prefixes; split them back out
+  // so each reads clearly.
+  const tips = a.tips ?? []
+  const order = tips.find((t) => t.startsWith('Order:'))?.replace(/^Order:\s*/, '')
+  const closed = tips.find((t) => t.startsWith('Typically closed:'))?.replace(/^Typically closed:\s*/, '')
+  const plainTips = tips.filter((t) => !t.startsWith('Order:') && !t.startsWith('Typically closed:'))
+
   return (
     <li className="relative">
       <span className="absolute -left-[35px] top-2 h-2.5 w-2.5 rounded-full bg-clay-400 ring-4 ring-paper" />
@@ -259,15 +273,23 @@ function ActivityItem({ a, itineraryId, slug }: { a: Activity; itineraryId: stri
       {a.location?.name && (
         <p className="mt-0.5 text-sm text-ink-mute">
           {a.location.name}{a.location.neighborhood ? ` · ${a.location.neighborhood}` : ''}
+          {' · '}
+          <a href={mapsHref(a.location)} target="_blank" rel="noopener noreferrer" className="text-clay-600 hover:underline">Map ↗</a>
         </p>
       )}
       <p className="mt-1.5 text-ink-soft">{a.description}</p>
       {a.whyThis && <p className="mt-1.5 text-sm italic text-ink-mute">{a.whyThis}</p>}
-      {a.tips?.length ? (
+      {order && (
+        <p className="mt-2 text-sm text-ink-soft"><span className="font-medium text-clay-700">Order</span> · {order}</p>
+      )}
+      {closed && (
+        <p className="mt-1 inline-block rounded-md bg-clay-50 px-2 py-0.5 text-sm text-clay-700">Closed: {closed}</p>
+      )}
+      {plainTips.length > 0 && (
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-ink-mute">
-          {a.tips.map((t, i) => <li key={i}>{t}</li>)}
+          {plainTips.map((t, i) => <li key={i}>{t}</li>)}
         </ul>
-      ) : null}
+      )}
       <AffiliateButtons links={a.affiliateLinks} itineraryId={itineraryId} slug={slug} compact />
     </li>
   )
