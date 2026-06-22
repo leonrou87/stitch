@@ -1,6 +1,7 @@
 import type { Itinerary, Activity, Day, Stay, FlightOption } from '@/lib/types/itinerary'
 import { AffiliateButtons } from './AffiliateButtons'
 import { ItineraryActions } from './ItineraryActions'
+import { DayMap } from './DayMap'
 import { formatBudgetRange, travelerLine, middot } from '@/lib/utils'
 import { CoverImage } from '@/components/ui/CoverImage'
 import { destinationByCity } from '@/lib/data/destinations'
@@ -238,6 +239,10 @@ function DayBlock({ day, itineraryId, slug }: { day: Day; itineraryId: string | 
       {total > 0 && (
         <p className="mb-7 text-sm text-ink-mute">Estimated <span className="font-medium text-ink-soft">~${total}</span> in entries and food this day, before stays.</p>
       )}
+      <DayMap points={day.activities
+        .filter((a) => typeof a.location?.lat === 'number' && typeof a.location?.lng === 'number')
+        .map((a) => ({ lat: a.location!.lat as number, lng: a.location!.lng as number, name: a.title }))}
+      />
       <ol className="relative ml-1.5 space-y-8 border-l border-paper-edge pl-7">
         {day.activities.map((a, i) => <ActivityItem key={i} a={a} itineraryId={itineraryId} slug={slug} />)}
       </ol>
