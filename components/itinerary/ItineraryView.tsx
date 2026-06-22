@@ -276,6 +276,19 @@ function GettingAround({ it }: { it: Itinerary }) {
         {g.walkability && <Fact label="On foot" value={g.walkability} />}
         {g.cyclingNotes && <Fact label="Cycling" value={g.cyclingNotes} />}
       </div>
+      {g.intercityTransport && g.intercityTransport.length > 0 && (
+        <div className="card mt-4 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-mute">Between cities</p>
+          <ul className="mt-2 space-y-1.5 text-ink-soft">
+            {g.intercityTransport.map((t, i) => (
+              <li key={i}>
+                <span className="font-medium">{t.from} → {t.to}</span> · {t.mode}
+                {t.durationHours ? ` · ~${t.durationHours}h` : ''}{typeof t.costUsd === 'number' ? ` · ~$${t.costUsd}` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </>
   )
 }

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { bundles } from '@/lib/data/bundles'
 import { destinationBySlug } from '@/lib/data/destinations'
 import { BundleCard } from '@/components/build/BundleCard'
+import { MultiCityCard } from '@/components/build/MultiCityCard'
+import { multiCityTrips } from '@/lib/data/multicity'
 
 export const metadata = {
   title: 'Curated trips',
@@ -21,6 +23,16 @@ export default function TripsPage() {
         Ready-made trips with a clear theme. Tap <span className="font-medium">Use this trip</span> for
         a finished itinerary in one go, or <span className="font-medium">Edit</span> to adjust the picks first.
       </p>
+
+      {multiCityTrips.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl">Across two cities</h2>
+          <p className="mt-1 text-sm text-ink-soft">Pair up nearby cities into one trip, with the train hop built in.</p>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {multiCityTrips.map((t) => <MultiCityCard key={t.id} trip={t} />)}
+          </div>
+        </section>
+      )}
 
       {Object.entries(byCity).map(([slug, list]) => {
         const dest = destinationBySlug(slug)

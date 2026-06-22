@@ -4,7 +4,9 @@ import { catalogCitySlugs, placesForCity } from '@/lib/data/catalog'
 import { destinationBySlug } from '@/lib/data/destinations'
 import { TripWizard } from '@/components/build/TripWizard'
 import { BundleCard } from '@/components/build/BundleCard'
+import { MultiCityCard } from '@/components/build/MultiCityCard'
 import { bundlesForCity } from '@/lib/data/bundles'
+import { multiCityForCity } from '@/lib/data/multicity'
 
 interface Props { params: Promise<{ city: string }> }
 
@@ -27,9 +29,19 @@ export default async function BuildCityPage({ params }: Props) {
   const dest = destinationBySlug(city)
   if (!dest || placesForCity(city).length === 0) notFound()
   const cityBundles = bundlesForCity(city)
+  const cityMulti = multiCityForCity(city)
 
   return (
     <>
+      {cityMulti.length > 0 && (
+        <section className="container-wide pt-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-clay-600">Pair with a nearby city</p>
+          <h2 className="mt-2 font-serif text-2xl">Make it a two-city trip</h2>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {cityMulti.map((t) => <MultiCityCard key={t.id} trip={t} />)}
+          </div>
+        </section>
+      )}
       {cityBundles.length > 0 && (
         <section className="container-wide pt-12">
           <p className="text-xs font-semibold uppercase tracking-widest text-clay-600">Start from a curated trip</p>
