@@ -3,6 +3,7 @@ import './globals.css'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { DisclosureBanner } from '@/components/layout/DisclosureBanner'
+import { ClaimTrips } from '@/components/account/ClaimTrips'
 import { clerkEnabled } from '@/lib/auth/clerk'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="skip-link">Skip to content</a>
         <SiteHeader />
         <main id="main">{children}</main>
+        {clerkEnabled && <ClaimTrips />}
         <SiteFooter />
         <DisclosureBanner />
               <script defer src="https://kytepush.com/track.js"></script>

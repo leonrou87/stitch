@@ -75,6 +75,11 @@ export function TripWizard({ citySlug, cityName }: { citySlug: string; cityName:
     if (p === 'slow' || p === 'moderate' || p === 'packed') setPace(p)
     const step = sp.get('step')
     if (step) { const i = STEPS.findIndex((s) => s.id === step); if (i >= 0) setStepIdx(i) }
+    // Prefill from saved account settings (home airport, default pace) — best-effort.
+    fetch('/api/me/settings').then((r) => r.json()).then((d) => {
+      if (d?.prefs?.homeAirport && !sp.get('add')) setOrigin(d.prefs.homeAirport)
+      if (d?.prefs?.defaultPace && !sp.get('pace')) setPace(d.prefs.defaultPace)
+    }).catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all])
 

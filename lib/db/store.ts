@@ -167,6 +167,47 @@ export async function incrementView(slug: string): Promise<void> {
   if (r) { r.view_count = Number(r.view_count ?? 0) + 1; writeJson(ITIN_FILE, all) }
 }
 
+// ---------- Accounts: claim trips + preferences ----------
+export async function claimItineraries(userId: string, slugs: string[]): Promise<number> {
+  if (!userId || !slugs.length) return 0
+  const sb = getSupabase()
+  if (sb) {
+    // Only claim trips that are currently unowned, so a shared link can't be stolen.
+    const { data } = await sb.from('itineraries').update({ owner_id: userId })
+      .in('slug', slugs).is('owner_id', null).select('slug')
+    return data?.length ?? 0
+  }
+  const all = readJson<Record<string, unknown>[]>(ITIN_FILE, [])
+  let n = 0
+  for (const r of all) if (slugs.includes(String(r.slug)) && !r.owner_id) { r.owner_id = userId; n++ }
+  if (n) writeJson(ITIN_FILE, all)
+  return n
+}
+
+export interface UserPrefs { homeAirport: string | null; defaultPace: string | null; dietary: string[] }
+
+export async function getUserPrefs(userId: string): Promise<UserPrefs | null> {
+  if (!userId) return null
+  const sb = getSupabase()
+  if (!sb) return null
+  const { data } = await sb.from('user_prefs').select('*').eq('user_id', userId).maybeSingle()
+  if (!data) return null
+  return { homeAirport: data.home_airport ?? null, defaultPace: data.default_pace ?? null, dietary: (data.dietary as string[]) ?? [] }
+}
+
+export async function saveUserPrefs(userId: string, prefs: Partial<UserPrefs>): Promise<void> {
+  if (!userId) return
+  const sb = getSupabase()
+  if (!sb) return
+  await sb.from('user_prefs').upsert({
+    user_id: userId,
+    home_airport: prefs.homeAirport ?? null,
+    default_pace: prefs.defaultPace ?? null,
+    dietary: prefs.dietary ?? [],
+    updated_at: new Date().toISOString(),
+  })
+}
+
 // ---------- Affiliate redirect (stateless) ----------
 const PARTNER_HOSTS = [
   'booking.com', 'flights.booking.com', 'kiwi.com', 'hotellook.com', 'search.hotellook.com',

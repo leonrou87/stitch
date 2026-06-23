@@ -12,7 +12,10 @@ export default async function MyTripsPage() {
 
   return (
     <div className="container-wide py-14">
-      <h1 className="font-serif text-4xl">My trips</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif text-4xl">My trips</h1>
+        {userId && <Link href="/me/settings" className="text-sm text-clay-600 hover:underline">Settings →</Link>}
+      </div>
       <p className="mt-3 max-w-prose text-ink-soft">
         {userId
           ? 'Saved to your account, so they follow you to any device.'
