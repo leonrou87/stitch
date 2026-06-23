@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NewsletterForm } from '@/components/NewsletterForm'
 
 const explore = [
   ['Curated trips', '/trips'],
@@ -27,6 +28,10 @@ export function SiteFooter() {
           <p className="mt-3 text-sm leading-relaxed text-ink-mute">
             Plan a trip that&apos;s actually yours.
           </p>
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-mute">Get a trip idea now and then</p>
+            <div className="mt-2"><NewsletterForm source="footer" /></div>
+          </div>
         </div>
 
         <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm">

@@ -4,6 +4,7 @@ import { CoverImage } from '@/components/ui/CoverImage'
 import { BundleCard } from '@/components/build/BundleCard'
 import { bundleById, bundles } from '@/lib/data/bundles'
 import { catalogCitySlugs } from '@/lib/data/catalog'
+import { NewsletterForm } from '@/components/NewsletterForm'
 
 const FEATURED = ['tokyo', 'lisbon', 'barcelona', 'mexico-city', 'paris', 'new-york-city']
 const FEATURED_BUNDLES = ['tokyo-foodie', 'lisbon-slow', 'paris-first']
@@ -134,6 +135,17 @@ export default function HomePage() {
             your time, arranged into days that actually flow — then gets out of the way so you can book.
           </p>
           <Link href="/trips" className="btn-clay mt-8 px-7 py-3 text-base">See a curated trip</Link>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="container-wide py-16">
+        <div className="card mx-auto flex max-w-3xl flex-col items-start gap-4 p-8 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-serif text-2xl">One good trip idea, now and then</h2>
+            <p className="mt-1 text-sm text-ink-soft">New cities and curated trips. No spam, unsubscribe anytime.</p>
+          </div>
+          <NewsletterForm source="landing" />
         </div>
       </section>
 
