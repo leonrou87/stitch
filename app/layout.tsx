@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { SiteFooter } from '@/components/layout/SiteFooter'
-import { DisclosureBanner } from '@/components/layout/DisclosureBanner'
+import { CookieConsent } from '@/components/layout/CookieConsent'
+import { Analytics } from '@/components/analytics/Analytics'
 import { ClaimTrips } from '@/components/account/ClaimTrips'
 import { clerkEnabled } from '@/lib/auth/clerk'
 
@@ -48,7 +49,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main id="main">{children}</main>
         {clerkEnabled && <ClaimTrips />}
         <SiteFooter />
-        <DisclosureBanner />
+        <CookieConsent />
+        <Analytics />
               <script defer src="https://kytepush.com/track.js"></script>
       </body>
     </html>
