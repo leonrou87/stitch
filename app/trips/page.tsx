@@ -6,6 +6,7 @@ import { MultiCityCard } from '@/components/build/MultiCityCard'
 import { multiCityTrips } from '@/lib/data/multicity'
 
 export const metadata = {
+  alternates: { canonical: '/trips' },
   title: 'Curated trips',
   description: 'Ready-made, themed itineraries — pick one and go, or tweak it to fit. No assembly required.',
 }

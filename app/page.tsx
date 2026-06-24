@@ -6,6 +6,8 @@ import { bundleById, bundles } from '@/lib/data/bundles'
 import { catalogCitySlugs } from '@/lib/data/catalog'
 import { NewsletterForm } from '@/components/NewsletterForm'
 
+export const metadata = { alternates: { canonical: '/' } }
+
 const FEATURED = ['tokyo', 'lisbon', 'barcelona', 'mexico-city', 'paris', 'new-york-city']
 const FEATURED_BUNDLES = ['tokyo-foodie', 'lisbon-slow', 'paris-first']
 const QUICK_CITIES = ['tokyo', 'paris', 'rome', 'lisbon', 'barcelona', 'new-york-city', 'london', 'istanbul']
@@ -30,8 +32,15 @@ export default function HomePage() {
   const cityCount = catalogCitySlugs.length
   const tripCount = bundles.length
 
+  const faqLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+  }
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       {/* Hero — full-bleed image with overlay */}
       <section className="relative -mt-px flex min-h-[82vh] items-center overflow-hidden">
         <CoverImage imageKey="city:tokyo" query="tokyo skyline dusk" alt="" priority className="absolute inset-0 h-full w-full" />

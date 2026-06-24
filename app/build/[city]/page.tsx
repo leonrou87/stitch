@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dest = destinationBySlug(city)
   if (!dest) return { title: 'Build a trip' }
   return {
+    alternates: { canonical: `/build/${city}` },
     title: `Build a ${dest.city} trip`,
     description: `Pick the places you want in ${dest.city} and we stitch them into a day-by-day itinerary.`,
   }

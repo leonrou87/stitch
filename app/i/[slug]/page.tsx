@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${it.dates.durationDays} days in ${it.destination.primaryCity}`,
     description: it.summary,
+    alternates: { canonical: `/i/${slug}` },
     openGraph: { title: `${it.dates.durationDays} days in ${it.destination.primaryCity}`, description: it.summary },
   }
 }

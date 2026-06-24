@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${d.city} travel guide`,
     description: `${d.overviewMarkdown.split('. ').slice(0, 2).join('. ')}.`,
+    alternates: { canonical: `/guide/${city}` },
   }
 }
 
@@ -38,9 +39,20 @@ export default async function DestinationGuide({ params }: Props) {
 
   const checkIn = '2026-09-10'
   const checkOut = '2026-09-14'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://stitch.kytepush.com'
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name: d.city,
+    description: d.overviewMarkdown,
+    url: `${appUrl}/guide/${city}`,
+    address: { '@type': 'PostalAddress', addressCountry: d.country },
+    geo: { '@type': 'GeoCoordinates', latitude: d.lat, longitude: d.lng },
+  }
 
   return (
     <article className="pb-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <div className="relative h-[38vh] min-h-[280px] w-full overflow-hidden">
         <CoverImage imageKey={`city:${d.slug}`} query={d.heroImageQuery} alt={d.city} priority className="absolute inset-0 h-full w-full" />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />

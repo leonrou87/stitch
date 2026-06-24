@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!d) return { title: 'Not found' }
   const built = guideRequest(d, slug)
   if (!built) return { title: 'Not found' }
-  return { title: built.title, description: built.lede }
+  return { title: built.title, description: built.lede, alternates: { canonical: `/guide/${city}/${slug}` } }
 }
 
 export default async function GuideItineraryPage({ params }: Props) {
