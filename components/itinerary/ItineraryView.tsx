@@ -26,6 +26,21 @@ function SectionRule({ children }: { children: React.ReactNode }) {
   return <h2 className="section-rule mb-5 mt-16">{children}</h2>
 }
 
+// Rough whole-trip budget: cheapest stay per leg × nights + cheapest flight + food/entries.
+function tripBudget(it: Itinerary): { flights: number; stays: number; activities: number; total: number } {
+  const activities = it.days.reduce((s, d) => s + dayBudget(d), 0)
+  let stays = 0
+  if (it.stays?.length) {
+    const nightsPer = Math.max(1, Math.round(it.dates.durationDays / it.stays.length))
+    for (const st of it.stays) {
+      const cheapest = Math.min(...st.options.map((o) => o.estimatedPriceUsdPerNight))
+      if (Number.isFinite(cheapest)) stays += cheapest * nightsPer
+    }
+  }
+  const flights = it.flights?.length ? Math.min(...it.flights.map((f) => f.estimatedPriceUsd)) : 0
+  return { flights, stays, activities, total: flights + stays + activities }
+}
+
 export function ItineraryView({
   itinerary,
   itineraryId,
@@ -84,6 +99,42 @@ export function ItineraryView({
         </div>
 
         <div className="mx-auto max-w-prose">
+          {(() => {
+            const b = tripBudget(it)
+            if (b.total <= 0) return null
+            const rows: [string, number, string?][] = [
+              ['Flights', b.flights, 'estimate, round trip'],
+              ['Stays', b.stays, `${it.dates.durationDays} nights, cheapest option`],
+              ['Food & entries', b.activities],
+            ].filter((r) => (r[1] as number) > 0) as [string, number, string?][]
+            return (
+              <div className="card mt-8 p-6">
+                <div className="flex items-baseline justify-between">
+                  <h2 className="font-serif text-xl">Estimated budget</h2>
+                  <span className="font-serif text-2xl text-clay-600">~${b.total.toLocaleString()}</span>
+                </div>
+                <ul className="mt-3 space-y-1.5 text-sm">
+                  {rows.map(([label, amount, note]) => (
+                    <li key={label} className="flex items-baseline justify-between gap-3">
+                      <span className="text-ink-soft">{label}{note ? <span className="text-ink-mute"> · {note}</span> : null}</span>
+                      <span className="font-medium">~${amount.toLocaleString()}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs text-ink-mute">A rough planning estimate, not a quote. Tap the booking links for live prices.</p>
+              </div>
+            )
+          })()}
+
+          {dest && (
+            <div className="card mt-4 p-6">
+              <h2 className="font-serif text-xl">When to go</h2>
+              <p className="mt-2 text-ink-soft"><span className="font-medium">Best months:</span> {dest.bestTimeToVisit.months.join(', ')}</p>
+              <p className="mt-1 text-sm text-ink-soft">{dest.bestTimeToVisit.notes}</p>
+              {dest.bestTimeToVisit.avoid && <p className="mt-1 text-sm text-ink-mute"><span className="font-medium">Heads up:</span> {dest.bestTimeToVisit.avoid}</p>}
+            </div>
+          )}
+
           {it.preTrip && <PreTrip it={it} itineraryId={itineraryId} slug={slug} />}
           {it.flights?.length ? <Flights flights={it.flights} itineraryId={itineraryId} slug={slug} /> : null}
           {it.stays?.length ? <Stays stays={it.stays} itineraryId={itineraryId} slug={slug} /> : null}
